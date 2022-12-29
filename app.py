@@ -7,7 +7,8 @@ import dotenv
 import os
 
 
-play = ["🖐️", "✌️", "✊"]
+play = ["✊", "✌️", "🖐️"]
+text = ["平手啦智障！", "你輸了 白癡 給我去尻尻！", "幹, 你是不是作弊啊！"]
 
 dotenv.load_dotenv()
 intents = discord.Intents.default()
@@ -26,18 +27,9 @@ async def on_message(msg):
         return
     # print(msg.content, msg.author)
     if msg.content in play:
-        com = random.choice(play)
-        if play.index(msg.content) == play.index(com):
-            await msg.channel.send("{}, 平手啦智障！".format(com))
-        elif play.index(msg.content) > play.index(com):
-            if play.index(msg.content) == 2 and play.index (com) == 0:
-                await msg.channel.send("{}, 你輸了 白癡 給我去尻尻！".format(com))
-            else:
-                await msg.channel.send("{}, 幹, 你是不是作弊啊！".format(com))
-        else:
-            if play.index(msg.content) == 0 and play.index(com) == 2:
-                await msg.channel.send("{}, 幹, 你是不是作弊啊！".format(com))
-            else:
-                await msg.channel.send("{}, 你輸了 白癡 給我去尻尻！".format(com))
+        player = play.index(msg.content)
+        com = random.randint(0, 2)
+        judge = (player-com+3)%3
+        await msg.channel.send(f'{play[com]}, {text[judge]}')
 
 client.run(os.getenv("token"))
