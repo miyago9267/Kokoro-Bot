@@ -1,7 +1,5 @@
 import discord
 import discord.emoji
-import asyncio
-import time
 import random
 import dotenv
 import os
@@ -9,7 +7,7 @@ import re
 
 
 play = ["✊", "✌️", "🖐️"]
-text = ["平手啦智障！", "你輸了 白癡 給我去尻尻！", "幹, 你是不是作弊啊！"]
+text = ["平手啦智障！", "你輸了 給我去尻尻！", "幹, 你是不是作弊啊！"]
 
 dotenv.load_dotenv()
 intents = discord.Intents.default()
@@ -33,8 +31,6 @@ async def on_message(msg):
         judge = (player-com+3)%3
         await msg.channel.send(f'{play[com]}')
         await msg.channel.send(f'{text[judge]}')
-    if re.search(r"我想死", msg.content):
-        await msg.channel.send(random.choice(["寶不要死", "7414啦"]))
     if re.search(r'隨機\s', msg.content):
         st_idx = msg.content.find('隨機 ')
         query_list = [i for i in msg.content[st_idx+3:].strip(' ').split(' ') if i != '']
