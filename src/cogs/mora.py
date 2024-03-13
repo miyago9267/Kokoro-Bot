@@ -25,19 +25,27 @@ class MoraKokoro(commands.Cog):
     async def on_message(self, msg):
         if msg.author == self.bot.user:
             return
-        # print(msg.content, msg.author)
 
         if msg.content in self.play:
-            player = self.play.index(msg.content)
-            com = random.randint(0, 2)
-            judge = (player-com+3)%3
-            await msg.channel.send(f'{self.play[com]}')
-            await msg.channel.send(f'{self.text[judge]}')
+            await self._mora(msg)
 
         if re.search(r'隨機\s', msg.content):
-            random_query = msg.content.replace('\n', ' ')
+            await self._random_choice(msg)
 
-            st_idx = random_query.find('隨機 ')
-            query_list = [i for i in random_query[st_idx+3:].strip(' ').split(' ') if i != '']
-            query_text = random_query[:st_idx]
+    async def _mora(self, msg):
+        player = self.play.index(msg.content)
+        com = random.randint(0, 2)
+        judge = (player-com+3)%3
+        await msg.channel.send(f'{self.play[com]}')
+        await msg.channel.send(f'{self.text[judge]}')
+
+    async def _random_choice(self, msg):
+        random_query = msg.content.replace('\n', ' ')
+
+        st_idx = random_query.find('隨機 ')
+        query_list = [i for i in random_query[st_idx+3:].strip(' ').split(' ') if i != '']
+        query_text = random_query[:st_idx]
+        if msg.author.id == self.bot.owner_id and '還沒死透' in query_list:
+            await msg.reply(f'隨機 [ {" ".join(query_list)} ]\n{"" if query_text==None else query_text} ➝ **還沒死透**')
+        else:
             await msg.reply(f'隨機 [ {" ".join(query_list)} ]\n{"" if query_text==None else query_text} ➝ **{random.choice(query_list)}**')

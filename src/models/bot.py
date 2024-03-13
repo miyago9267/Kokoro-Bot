@@ -14,6 +14,7 @@ class Bot(commands.Bot):
             intents=intents,
             help_command=None
         )
+        self.owner_id = int(os.getenv('OWNER_ID'))
 
     async def on_ready(self):
         await self.add_cog(BotEventsCog(self))
