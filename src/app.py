@@ -1,6 +1,6 @@
 from dotenv import load_dotenv
 import os
-from src.models.bot import Bot
+from models.bot import Bot
 
 load_dotenv()
 
