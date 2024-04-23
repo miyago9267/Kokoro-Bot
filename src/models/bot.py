@@ -2,7 +2,8 @@ import discord.ext.commands as commands
 import discord
 import os
 from dotenv import load_dotenv
-from src.cogs.mora import MoraKokoro
+from cogs.mora import MoraKokoro
+from cogs.keyword_response import ResponseKokoro
 
 load_dotenv()
 
@@ -19,6 +20,8 @@ class Bot(commands.Bot):
     async def on_ready(self):
         await self.add_cog(BotEventsCog(self))
         await self.add_cog(MoraKokoro(self))
+        await self.add_cog(ResponseKokoro(self))
+
 
 class BotEventsCog(commands.Cog):
     def __init__(self, bot):
