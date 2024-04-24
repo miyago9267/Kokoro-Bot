@@ -25,7 +25,8 @@ class ResponseKokoro(commands.Cog):
         if res is not {}:
             for keyword in res:
                 # res_list = self.key_res_mp[keyword]['value']
-                res_list = requests.get(f'http://127.0.0.1:3150/mygo/img?keyword={keyword}').json().get('urls', [])
+                query_key = random.choice(self.key_res_mp[keyword].get('value'))
+                res_list = requests.get(f'http://127.0.0.1:3150/mygo/img?keyword={query_key}&fuzzy=false').json().get('urls', [])
                 await self._send_text(msg, random.choice(res_list))
 
     async def _send_text(self, msg, responce):
