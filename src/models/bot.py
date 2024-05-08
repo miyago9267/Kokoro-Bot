@@ -2,8 +2,7 @@ import discord.ext.commands as commands
 import discord
 import os
 from dotenv import load_dotenv
-from cogs.mora import MoraKokoro
-from cogs.keyword_response import ResponseKokoro
+from cogs import load_cogs
 
 load_dotenv()
 
@@ -17,25 +16,12 @@ class Bot(commands.Bot):
         )
         self.owner_id = int(os.getenv('OWNER_ID'))
 
+    async def setup(self):
+        pass
+
     async def on_ready(self):
-        await self.add_cog(BotEventsCog(self))
-        await self.add_cog(MoraKokoro(self))
-        await self.add_cog(ResponseKokoro(self))
+        await load_cogs(self)
+        await self.tree.sync()
 
-
-class BotEventsCog(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
-    @commands.Cog.listener()
-    async def on_ready(self):
-        print('Bot is ready!')
-        print('Name: {}'.format(self.bot.user.name))
-        print('ID: {}'.format(self.bot.user.id))
-
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        if message.author == self.bot.user:
-            return
-        if message.content.startswith('!hello'):
-            await message.channel.send('Hello!')
+    async def sync(ctx):
+        print(f"Synced {len(synced)} command(s).")

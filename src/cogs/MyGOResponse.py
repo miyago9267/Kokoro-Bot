@@ -5,7 +5,7 @@ import re, random, json, os
 from pathlib import Path
 import requests
 
-class ResponseKokoro(commands.Cog):
+class MyGOResponse(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -55,3 +55,6 @@ class ResponseKokoro(commands.Cog):
 
     async def _send_text(self, msg, responce) -> None:
         await msg.channel.send(responce)
+
+async def setup(bot):
+    await bot.add_cog(MyGOResponse(bot))
