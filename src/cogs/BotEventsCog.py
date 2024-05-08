@@ -1,5 +1,6 @@
 from discord.ext import commands
 from discord import app_commands
+import discord
 
 class BotEventsCog(commands.Cog):
     def __init__(self, bot):
@@ -38,7 +39,7 @@ class BotEventsCog(commands.Cog):
         embed.add_field(name='mygo貼圖搜尋器', value=mygo_desc, inline=False)
         embed.add_field(name='/choice', value=choice_desc, inline=False)
         embed.add_field(name='/song', value=song_desc, inline=False)
-        await ctx.send(embed=embed)
+        await itr.channel.send(embed=embed)
 
 async def setup(bot):
     await bot.add_cog(BotEventsCog(bot))
