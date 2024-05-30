@@ -23,5 +23,3 @@ class Bot(commands.Bot):
         await load_cogs(self)
         await self.tree.sync()
 
-    async def sync(ctx):
-        print(f"Synced {len(synced)} command(s).")

@@ -31,8 +31,8 @@ class BotEventsCog(commands.Cog):
         )
         mora_desc = '`✊✌️🖐️` - 跟可可蘿猜拳，贏了他不會脫給你看'
         random_desc = '`[隨機用途(可選)] 隨機 <選項1> <選項2> ...` - 隨機選擇'
-        choice_desc = '`choice dinner` - 決定晚餐要吃什麼\n`choice roulette` - 俄羅斯輪盤, 抽到子彈就被踢出去，子彈只有一顆'
-        song_desc = '`song add <歌名>` - 增加一首歌至題庫中\n`song list` - 列出現有的歌單\n`song delete <歌曲編號>` - 刪除一首歌'
+        choice_desc = '`/choice dinner` - 決定晚餐要吃什麼\n`/choice roulette` - 俄羅斯輪盤, 抽到子彈就被/kick出去，子彈只有一顆'
+        song_desc = '`/guesssong add <歌名>` - 增加一首歌至題庫中\n`/guesssong list` - 列出現有的歌單\n`/guesssong delete <歌曲編號>` - 刪除一首歌\n`/guesssong startplay` - 開一場遊戲\n`/guesssong endplay` - 強制停止一場遊戲\n`/guesssong reveal <字母>` - 開一個字母\n`/guesssong guess <歌名>` - 直接猜歌名\n`/guesssong check` - 查看本場題目'
         mygo_desc = '`$mygo <關鍵字>` - 搜尋mygo貼圖'
         embed.add_field(name='猜拳', value=mora_desc, inline=False)
         embed.add_field(name='隨機選擇器', value=random_desc, inline=False)

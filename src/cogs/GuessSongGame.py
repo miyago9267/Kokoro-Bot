@@ -17,7 +17,28 @@ class GuessSongGame(commands.Cog):
         self.activeGuessed: list = [] # songStore[activeId] but guessed(題目 會顯示給使用者看的)
         self.activeProblemCount: int = 0 # 現在還剩幾題沒開
 
+        self.export_json_path = Path(__file__).parent.parent / 'static' / 'songlist.json'
+        self.load_import()
+
     guesssong = app_commands.Group(name='guesssong', description='猜歌遊戲')
+
+    # For debug
+    @commands.command(name='songlist')
+    async def songlist(self, ctx):
+        content = ctx.message.content[10:]
+        if content == '':
+            await ctx.channel.send(f"目前的題目: \n{self.formatGuessForm(self.activeGuessed)}")
+            return
+        # print(self.songsStore.get(int(content)))
+        try:
+            if self.songsStore.get(int(content)):
+                await ctx.channel.send(f"目前的題目: \n{self.formatGuessForm(self.songsStore[int(content)])}")
+                return
+            pass
+        except:
+            await ctx.channel.send(f"到底在輸入三小")
+            return
+        pass
 
     # For Game Authorities
     @guesssong.command(name='add', description="增加一首歌至題庫中")
@@ -34,6 +55,7 @@ class GuessSongGame(commands.Cog):
             return
         self.songsStore[author].append(song)
         await itr.response.send_message(f"已添加: {song}", ephemeral=True)
+        self.save_export()
         pass
 
     # For Game Authorities
@@ -41,15 +63,15 @@ class GuessSongGame(commands.Cog):
     async def lists(self, itr):
         author = itr.user.id
         if author not in self.songsStore or self.songsStore[author] == []:
-            res = "You have no songs in your list"
+            res = "你還沒有建立歌單喔"
         else:
             res = self.formatGuessForm(self.songsStore[author])
-            res = f'You have {len(self.songsStore[author])} songs in your list: {res}'
+            res = f'你有 {len(self.songsStore[author])} 首歌在清單中: {res}'
         await itr.response.send_message(res, ephemeral=True)
         pass
 
     # For Game Authorities
-    @guesssong.command(name='delete', description="刪除一首歌")
+    @guesssong.command(name='delete', description="刪除題庫清單中的一首歌")
     @app_commands.describe(id='歌曲序號')
     async def delete(self, itr, id: int = None):
         if id is None:
@@ -68,6 +90,21 @@ class GuessSongGame(commands.Cog):
 
         song = self.songsStore[author].pop(id-1)
         await itr.response.send_message(f'已刪除 {song}', ephemeral=True)
+        self.save_export()
+        return
+        pass
+
+    # For Game Authorities
+    @guesssong.command(name='deleteall', description="刪除題庫清單度所有歌")
+    async def delete_all(self, itr):
+        author = itr.user.id
+        if author not in self.songsStore:
+            await itr.response.send_message("老兄你沒有出任何歌", ephemeral=True)
+            return
+
+        self.songsStore[author] = []
+        await itr.response.send_message(f'已刪除全部歌曲', ephemeral=True)
+        self.save_export()
         return
         pass
 
@@ -89,7 +126,8 @@ class GuessSongGame(commands.Cog):
             await itr.response.send_message(f"猜對了! {guess}\n{self.formatGuessForm(self.activeGuessed)}")
             if self.activeProblemCount == 0:
                 await itr.channel.send(f"本局遊戲已全部開盤完畢!")
-                self.reset()
+                self.resetGame()
+                self.songsStore[self.activeId] = []
             return
         else:
             await itr.response.send_message(f"猜錯了!")
@@ -101,6 +139,9 @@ class GuessSongGame(commands.Cog):
     async def reveal(self, itr, letter: str = None):
         if letter is None:
             await itr.response.send_message("你根本沒猜", ephemeral=True)
+            return
+        if letter in self.activeRevealed:
+            await itr.response.send_message("這個字元已經被猜過了", ephemeral=True)
             return
         self.revealAlphabet(letter)
         await itr.response.send_message(f"{self.formatGuessForm(self.activeGuessed)}")
@@ -118,13 +159,13 @@ class GuessSongGame(commands.Cog):
             return
         self.activeId = author
         self.activeStore = self.songsStore[author]
-        self.hideAll()
+        self.activeGuessed = self.hideAll(self.activeStore)
         self.activeRevealed = []
         self.activeProblemCount = len(self.activeStore)
         await itr.response.send_message(f"猜歌遊戲開始! \n{self.formatGuessForm(self.activeGuessed)}")
         pass
 
-    # For authorities
+    # For game authorities
     @guesssong.command(name='stopgame', description="終止遊戲")
     async def stopplay(self, itr):
         author = itr.user.id
@@ -132,7 +173,7 @@ class GuessSongGame(commands.Cog):
                 await itr.response.send_message("目前沒有遊戲正在進行", ephemeral=True)
                 return
         if author == self.activeId:
-            self.reset()
+            self.resetGame()
             await itr.response.send_message("出題者已手動重置遊戲")
             return
         else:
@@ -147,6 +188,36 @@ class GuessSongGame(commands.Cog):
             await itr.response.send_message("目前沒有遊戲正在進行", ephemeral=True)
             return
         await itr.response.send_message(f"目前的題目: \n{self.formatGuessForm(self.activeGuessed)}")
+        pass
+
+    # For game authorities
+    @guesssong.command(name='open', description="使用暱稱或字串不完全批配時由出題者直接開題目")
+    async def open(self, itr, id: int = None):
+        if self.activeId < 1:
+            await itr.response.send_message("目前沒有遊戲正在進行", ephemeral=True)
+            return
+        author = itr.user.id
+        if author != self.activeId:
+            await itr.response.send_message("這不是你的場，你沒有權限開題目", ephemeral=True)
+            return
+        if id is None:
+            await itr.response.send_message("輸入要開的題目編號", ephemeral=True)
+            return
+        if id not in range(1, len(self.activeStore)+1):
+            await itr.response.send_message("查無此號", ephemeral=True)
+            return
+        self.activeGuessed[id-1] = self.activeStore[id-1]
+        pass
+
+    @guesssong.command(name='preview', description="歌單編輯期間預覽題目的樣子")
+    async def preview(self, itr):
+        author = itr.user.id
+        if author not in self.songsStore or self.songsStore[author] == []:
+            res = "你還沒有建立歌單喔"
+        else:
+            res = self.formatGuessForm(self.hideAll(self.songsStore[author]))
+            res = f'你有 {len(self.songsStore[author])} 首歌在清單中: {res}'
+        await itr.response.send_message(res, ephemeral=True)
         pass
 
     def formatGuessForm(self, form):
@@ -167,24 +238,40 @@ class GuessSongGame(commands.Cog):
         self.activeRevealed.append(letter)
         pass
 
-    def hideAll(self):
-        tmp = self.activeStore.copy()
-        self.activeGuessed = []
-        for item in tmp:
+    def hideAll(self, store: list[str]) -> list[str]:
+        tmp = []
+        for item in store:
             res = ''
             for letter in item:
                 res += ('*' if letter!=' ' else ' ')
-            self.activeGuessed.append(res)
+            tmp.append(res)
+        return tmp
         pass
 
-    def reset(self):
+    def resetGame(self):
         self.activeStore = []
         self.activeRevealed = []
         self.activeGuessed = []
         self.activeProblemCount = 0
-        self.songsStore[self.activeId] = []
         self.activeId = 0
+        self.save_export()
         pass
+
+    def save_export(self):
+        with self.export_json_path.open('w', encoding='utf-8') as file:
+            json.dump(self.songsStore, file, ensure_ascii=False, indent=4)
+
+    def load_import(self):
+        if not self.export_json_path.exists():
+            return
+
+        if self.export_json_path.stat().st_size == 0:
+            return
+
+        with self.export_json_path.open('r', encoding='utf-8') as file:
+            tmp = json.load(file)
+        for key, value in tmp.items():
+            self.songsStore[int(key)] = value
 
 async def setup(bot):
     await bot.add_cog(GuessSongGame(bot))

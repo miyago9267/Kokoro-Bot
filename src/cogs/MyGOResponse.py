@@ -28,7 +28,9 @@ class MyGOResponse(commands.Cog):
         if msg.author == self.bot.user:
             return
 
-        return
+        if msg.content[:6] == '$mygo ':
+            return
+        # return
 
         query_key = await self._check_keyword(msg)
         if query_key is not None:
@@ -50,7 +52,7 @@ class MyGOResponse(commands.Cog):
     async def _fetch_responce(self, query_key) -> list:
         request_url = f'http://127.0.0.1:3150/mygo/img?keyword={query_key}'
         res_list = requests.get(request_url).json().get('urls', [])
-        return random.choice(res_list) if res_list else []
+        return random.choice(res_list).get('url') if res_list else []
 
 
     async def _send_text(self, msg, responce) -> None:

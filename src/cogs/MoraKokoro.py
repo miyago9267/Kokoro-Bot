@@ -33,9 +33,10 @@ class MoraKokoro(commands.Cog):
             await self._mora(msg.content)
 
         if re.search(r'隨機\s', msg.content):
-            await self._send_response(msg, self._random_choice(msg.author.id, msg))
+            await self._send_response(msg, self._random_choice(msg.author.id, msg.content))
 
     @choice.command(name='dinner', description='決定晚餐要吃什麼')
+    @app_commands.describe(choice='備選選項 沒靈感可以用預設的')
     async def choice_dinner(self, itr, choice: str = None):
         if choice == '一中':
             choices = [
