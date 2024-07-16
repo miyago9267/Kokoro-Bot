@@ -30,7 +30,7 @@ class MoraKokoro(commands.Cog):
             return
 
         if msg.content in self.play:
-            await self._mora(msg.content)
+            await self._mora(msg)
 
         if re.search(r'隨機\s', msg.content):
             await self._send_response(msg, self._random_choice(msg.author.id, msg.content))
