@@ -8,6 +8,7 @@ import requests
 class MyGOResponse(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.ignore_channels = [1011948815391137832]
 
         self.json_path = Path(__file__).parent.parent / 'static' / 'responce_key.json'
         self.mygo_path = Path(__file__).parent.parent / 'static' / 'mygo.json'
@@ -31,6 +32,9 @@ class MyGOResponse(commands.Cog):
         if msg.content[:6] == '$mygo ':
             return
         # return
+
+        if msg.channel in self.ignore_channels:
+            return
 
         query_key = await self._check_keyword(msg)
         if query_key is not None:
