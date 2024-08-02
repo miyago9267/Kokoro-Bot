@@ -54,7 +54,7 @@ class MyGOResponse(commands.Cog):
         return None
 
     async def _fetch_responce(self, query_key) -> list:
-        request_url = f'http://127.0.0.1:3150/mygo/img?keyword={query_key}'
+        request_url = f'https://mygoapi.miyago9267.com/mygo/img?keyword={query_key}'
         res_list = requests.get(request_url).json().get('urls', [])
         return random.choice(res_list).get('url') if res_list else []
 
