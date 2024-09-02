@@ -10,8 +10,10 @@ class MyGOResponse(commands.Cog):
         self.bot = bot
         self.ignore_channels = [1011948815391137832]
 
-        self.json_path = Path(__file__).parent.parent / 'static' / 'responce_key.json'
         self.mygo_path = Path(__file__).parent.parent / 'static' / 'mygo.json'
+        self.key_res_mp = {}
+
+        self._load_response()
 
     @commands.command(name='mygo')
     async def mygo(self, ctx):
@@ -23,6 +25,10 @@ class MyGOResponse(commands.Cog):
             await msg.channel.send('查無此圖')
             await self._send_text(msg, await self._fetch_responce('找不到'))
 
+    @commands.command(name='mygoreload')
+    async def mygoreload(self, ctx):
+        await self._load_responce()
+        await self._send_text(ctx.message, 'mygo response reload successfully!')
 
     @commands.Cog.listener()
     async def on_message(self, msg):
@@ -31,9 +37,12 @@ class MyGOResponse(commands.Cog):
 
         if msg.content[:6] == '$mygo ':
             return
-        # return
+
+        if msg.content[:11] == '$mygoreload':
+            return
 
         if msg.channel in self.ignore_channels:
+            print('ignore channel')
             return
 
         query_key = await self._check_keyword(msg)
@@ -42,9 +51,6 @@ class MyGOResponse(commands.Cog):
             await self._send_text(msg, responce)
 
     async def _check_keyword(self, msg) -> str:
-        with self.mygo_path.open('r', encoding='utf-8') as file:
-            self.key_res_mp = json.load(file)
-
         aho_corasick = AhoCorasick(self.key_res_mp.keys())
         res = aho_corasick.search(msg.content.lower())
         if res is not {}:
@@ -58,6 +64,9 @@ class MyGOResponse(commands.Cog):
         res_list = requests.get(request_url).json().get('urls', [])
         return random.choice(res_list).get('url') if res_list else []
 
+    async def _load_response(self) -> dict:
+        with self.mygo_path.open('r', encoding='utf-8') as file:
+            return json.load(file)
 
     async def _send_text(self, msg, responce) -> None:
         await msg.channel.send(responce)
