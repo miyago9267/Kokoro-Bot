@@ -13,7 +13,6 @@ class MyGOResponse(commands.Cog):
         self.mygo_path = Path(__file__).parent.parent / 'static' / 'mygo.json'
         self.key_res_mp = {}
 
-        self._load_response()
 
     @commands.command(name='mygo')
     async def mygo(self, ctx):
@@ -51,6 +50,9 @@ class MyGOResponse(commands.Cog):
             await self._send_text(msg, responce)
 
     async def _check_keyword(self, msg) -> str:
+        if self.key_res_mp == {}:
+            self.key_res_mp = await self._load_response()
+
         aho_corasick = AhoCorasick(self.key_res_mp.keys())
         res = aho_corasick.search(msg.content.lower())
         if res is not {}:
