@@ -1,13 +1,6 @@
 #!/bin/bash
 user="kokoro"
-name="kkr_mora_bot"
-
-if [ command -v poetry &> /dev/null ]; then
-    poetry export --without_hashes > requirements.txt
-else
-    echo "Poetry not found. Using requirements.txt"
-    exit
-fi
+name="kokoro-bot"
 
 docker build \
     $@ -t $user/$name:latest . || exit
