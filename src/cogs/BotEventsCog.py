@@ -16,8 +16,14 @@ class BotEventsCog(commands.Cog):
     async def on_message(self, message):
         if message.author == self.bot.user:
             return
+
         if message.content.startswith('!hello'):
             await message.channel.send('Hello!')
+
+        if message.content.startswith('!reloadsync'):
+            await load_cogs(self.bot)
+            await self.bot.tree.sync()
+            await message.channel.send('reload successfully!')
 
     @app_commands.command(name='ping', description='Ping Pong')
     async def ping(self, itr):
