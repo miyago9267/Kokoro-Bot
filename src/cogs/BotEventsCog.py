@@ -25,6 +25,14 @@ class BotEventsCog(commands.Cog):
             await self.bot.tree.sync()
             await message.channel.send('reload successfully!')
 
+        if message.content.startswith('!emojis'):
+            emojis = message.guild.emojis
+            if emojis:
+                emoji_list = [f"\<:{emoji.name}:{emoji.id}>" for emoji in emojis]
+                await message.channel.send("\n".join(emoji_list))
+            else:
+                await message.channel.send("此伺服器沒有自訂表情符號。")
+
     @app_commands.command(name='ping', description='Ping Pong')
     async def ping(self, itr):
         await itr.response.send_message('Pong!')

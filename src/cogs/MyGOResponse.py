@@ -8,7 +8,7 @@ import requests
 class MyGOResponse(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.ignore_channels = [1011948815391137832]
+        self.ignore_channels = [int(mid) for mid in os.getenv("DISABLE_CHANNEL_ID", "").split(",")]
 
         self.mygo_path = Path(__file__).parent.parent / 'static' / 'mygo.json'
         self.key_res_mp = {}
