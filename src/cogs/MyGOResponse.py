@@ -40,7 +40,7 @@ class MyGOResponse(commands.Cog):
         if msg.content[:11] == '$mygoreload':
             return
 
-        if msg.channel in self.ignore_channels:
+        if msg.channel.id in self.ignore_channels:
             print('ignore channel')
             return
 
