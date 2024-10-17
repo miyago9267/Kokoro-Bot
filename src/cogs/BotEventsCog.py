@@ -1,5 +1,9 @@
 from discord.ext import commands
 from discord import app_commands
+from homo_py import homo
+from typing import Union
+from . import load_cogs
+import re
 import discord
 
 class BotEventsCog(commands.Cog):
@@ -28,7 +32,7 @@ class BotEventsCog(commands.Cog):
         if message.content.startswith('!emojis'):
             emojis = message.guild.emojis
             if emojis:
-                emoji_list = [f"\<:{emoji.name}:{emoji.id}>" for emoji in emojis]
+                emoji_list = [f"\\<:{emoji.name}:{emoji.id}>" for emoji in emojis]
                 await message.channel.send("\n".join(emoji_list))
             else:
                 await message.channel.send("此伺服器沒有自訂表情符號。")
@@ -36,6 +40,14 @@ class BotEventsCog(commands.Cog):
     @app_commands.command(name='ping', description='Ping Pong')
     async def ping(self, itr):
         await itr.response.send_message('Pong!')
+
+    @app_commands.command(name='homo', description='惡臭數字驗證器')
+    async def homo(self, itr, num: str):
+        result = homo(num)
+        if re.match(r'^[0-9+\-*/.()]+$', result):
+            await itr.response.send_message(f"像{num}這種惡臭一定等於{result}的罷（惱。")
+        else:
+            await itr.response.send_message(result)
 
     @app_commands.command(name='help', description='功能列表')
     async def help(self, itr, group: str = None):
