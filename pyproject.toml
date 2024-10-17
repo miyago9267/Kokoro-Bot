@@ -6,11 +6,12 @@ authors = ["Miyago"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.12"
 python-discord = "^1.7.3"
 python-dotenv = "^1.0.0"
-discord-py = "^2.3.1"
+discord-py = "^2.4.0"
 requests = "^2.31.0"
+python-homo-generator = "^1.0.0"
 
 
 [build-system]
