@@ -32,7 +32,7 @@ class MoraKokoro(commands.Cog):
         if msg.content in self.play:
             await self._mora(msg)
 
-        if re.search(r'隨機\s', msg.content):
+        if re.search(r'\A(隨機\s|\S+\s隨機\s)', msg.content):
             await self._send_response(msg, self._random_choice(msg.author.id, msg.content))
 
     @choice.command(name='dinner', description='決定晚餐要吃什麼')
