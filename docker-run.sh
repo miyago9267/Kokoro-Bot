@@ -12,4 +12,5 @@ docker run \
 	-u $(id -u):$(id -g) \
 	--name $name \
     --network host \
+	--restart=always \
 	$user/$name:latest
