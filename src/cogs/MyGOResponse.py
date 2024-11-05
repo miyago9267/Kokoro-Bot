@@ -47,6 +47,8 @@ class MyGOResponse(commands.Cog):
         query_key = await self._check_keyword(msg)
         if query_key is not None:
             response = await self._fetch_response(query_key)
+            if len(response) and response is not None:  
+                return
             await self._send_text(msg, response)
 
     async def _check_keyword(self, msg) -> str:
