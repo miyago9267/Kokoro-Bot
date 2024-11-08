@@ -1,7 +1,7 @@
 from discord import app_commands
 from discord.ext import commands
 import discord
-import re, random
+import re, random, datetime
 
 class MoraKokoro(commands.Cog):
     def __init__(self, bot):
@@ -57,6 +57,20 @@ class MoraKokoro(commands.Cog):
         choices = ['空' for i in range(bullets-1)] + ['子彈']
         res = self._random_choice(itr.user.id, '隨機 '+' '.join(choices))
         await itr.response.send_message(res)
+        if bullets >= 69 and res[-4:-2] == '子彈':
+            minutes = 10
+            role_id = 1304275645483974748
+
+            user = itr.user
+            member = itr.guild.get_member(user.id)
+            role = itr.guild.get_role(role_id)
+
+            until = discord.utils.utcnow() + datetime.timedelta(minutes=minutes)
+            res = f'{member.mention}已被擊斃，獲得甘迺迪身分組及{minutes}分鐘禁言'
+
+            await member.edit(timed_out_until=until, reason='你現在是美國總統，請等待10分鐘復活賽')
+            await member.add_roles(role)
+            await itr.channel.send(res)
 
     async def _mora(self, msg):
         player = self.play.index(msg.content)
