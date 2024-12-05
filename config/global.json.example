@@ -1,0 +1,14 @@
+{
+    "KennedyRole": {
+        "guild_id": "roleid: int"
+
+    },
+    "RoleAdd": {
+        "message_id": {
+            "<:EmojiName:EmojiID>": "roleid: int"
+        }
+    },
+    "AllowChannels": [
+        "channelid: int"
+    ]
+}

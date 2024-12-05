@@ -1,17 +1,16 @@
 [tool.poetry]
 name = "paperscissorstone"
-version = "0.2.0"
-description = ""
-authors = ["Miyago"]
+version = "0.4.0"
+description = "Discord bot for miyago own server name Kokkoro"
+authors = ["miyago9267"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-python-discord = "^1.7.3"
 python-dotenv = "^1.0.0"
-discord-py = "^2.4.0"
 requests = "^2.31.0"
 python-homo-generator = "^1.0.0"
+discord-py = "^2.4.0"
 
 
 [build-system]

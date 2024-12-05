@@ -165,3 +165,6 @@ dev-logs.md
 exec/
 data/
 songlist.*
+
+config/*
+!config/global.json.example

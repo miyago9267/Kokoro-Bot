@@ -1,7 +1,6 @@
 from dotenv import load_dotenv
 import os
 from models.bot import Bot
-
 load_dotenv()
 
 def bot_start():

@@ -1,5 +1,6 @@
 from discord import app_commands
 from discord.ext import commands
+from config import global_config
 import discord
 import re, random, datetime
 
@@ -38,11 +39,7 @@ class MoraKokoro(commands.Cog):
     @choice.command(name='dinner', description='決定晚餐要吃什麼')
     @app_commands.describe(choice='備選選項 沒靈感可以用預設的')
     async def choice_dinner(self, itr, choice: str = None):
-        if choice == '一中':
-            choices = [
-                '小象', '雲居', '丸勝', '漁藏', '山西刀削麵', '拓海家', 'すきや', '麥當勞', '火鍋', '就醬拌'
-            ]
-        elif choice:
+        if choice:
             choices = choice.split(' ')
         else:
             choices = ['火鍋','壽司','鐵板燒','鍋燒','水餃','炒飯','拉麵','麵攤','便當','超商']
@@ -51,18 +48,26 @@ class MoraKokoro(commands.Cog):
     @choice.command(name='roulette', description='俄羅斯輪盤, 抽到子彈就被踢出去，子彈只有一顆')
     @app_commands.describe(bullets='彈巢容量, 當中有一個會是子彈')
     async def choice_roulette(self, itr, bullets: int = 1):
+        if bullets == None:
+            bullets = 0
         if bullets < 1:
             await itr.response.send_message('彈巢空間至少要有一顆子彈', ephemeral=True)
             return
         choices = ['空' for i in range(bullets-1)] + ['子彈']
         res = self._random_choice(itr.user.id, '隨機 '+' '.join(choices))
+        user = itr.user
+        member = itr.guild.get_member(user.id)
         await itr.response.send_message(res)
-        if bullets >= 69 and res[-4:-2] == '子彈':
+        if bullets >= 69 and res[-4:-2] == '子彈' and not itr.user.id == itr.guild.owner_id:
             minutes = 10
-            role_id = 1304275645483974748
+            guild_id = itr.guild.id
+            role_id = global_config.get("KennedyRole", {}).get(str(guild_id), None)
 
-            user = itr.user
-            member = itr.guild.get_member(user.id)
+            if role_id == None:
+                res = f'{member.mention}已被擊斃，獲得{minutes}分鐘禁言'
+                await itr.channel.send(res)
+                return
+
             role = itr.guild.get_role(role_id)
 
             until = discord.utils.utcnow() + datetime.timedelta(minutes=minutes)
@@ -71,6 +76,9 @@ class MoraKokoro(commands.Cog):
             await member.edit(timed_out_until=until, reason='你現在是美國總統，請等待10分鐘復活賽')
             await member.add_roles(role)
             await itr.channel.send(res)
+        elif bullets >= 69 and res[-4:-2] == '子彈' and itr.user.id == itr.guild.owner_id:
+            res = f'{member.mention}已被擊斃，但是可可蘿ban不掉群主'
+            await itr.channel.send(f'{res}')
 
     async def _mora(self, msg):
         player = self.play.index(msg.content)

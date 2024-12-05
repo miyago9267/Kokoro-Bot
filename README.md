@@ -2,7 +2,7 @@
 
 ## Version
 
-0.3.0
+0.4.0
 
 ## Description
 
@@ -21,3 +21,4 @@ sh docker-run.sh
 - [x] Send message while user join or leave server
 - [x] Add role by clicking reaction
 - [x] Send MyGO picture for response
+- [x] Allow admin to customize able and ignore channel

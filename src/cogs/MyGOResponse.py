@@ -1,14 +1,15 @@
 from discord.ext import commands
 from algo.search import AhoCorasick
+from pathlib import Path
+from config import global_config
 import discord
 import re, random, json, os
-from pathlib import Path
 import requests
 
 class MyGOResponse(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.ignore_channels = [int(mid) for mid in os.getenv("DISABLE_CHANNEL_ID", "").split(",")]
+        self.allow_channels = global_config.get("AllowChannels", [])
 
         self.mygo_path = Path(__file__).parent.parent / 'static' / 'mygo.json'
         self.key_res_mp = {}
@@ -40,7 +41,7 @@ class MyGOResponse(commands.Cog):
         if msg.content[:11] == '$mygoreload':
             return
 
-        if msg.channel.id in self.ignore_channels:
+        if msg.channel.id not in self.allow_channels:
             print('ignore channel')
             return
 
