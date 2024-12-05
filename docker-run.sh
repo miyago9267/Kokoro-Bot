@@ -13,4 +13,5 @@ docker run \
 	--name $name \
     --network host \
 	--restart=always \
+	--volume ./config:/app/config/ \
 	$user/$name:latest
