@@ -2,6 +2,7 @@ from discord.ext import commands
 from discord import app_commands
 from homo_py import homo
 from typing import Union
+from config import reload_global_config
 from . import load_cogs
 import re
 import discord
@@ -36,6 +37,15 @@ class BotEventsCog(commands.Cog):
                 await message.channel.send("\n".join(emoji_list))
             else:
                 await message.channel.send("此伺服器沒有自訂表情符號。")
+
+        if message.content.startswith('!reloadsettings'):
+            try:
+                reload_global_config()
+                await message.channel.send('reload successfully!')
+            except Exception as e:
+                print('reload failed! {}'.format(e))
+                await message.channel.send('reload failed! {}'.format(e))
+            
 
     @app_commands.command(name='ping', description='Ping Pong')
     async def ping(self, itr):

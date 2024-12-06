@@ -1,6 +1,6 @@
 from discord.ext import commands
 from pathlib import Path
-from config import global_config, load_config, GLOBAL_CONFIG_PATH
+from config import global_config, reload_global_config
 import json
 import os
 
@@ -62,7 +62,7 @@ class RoleAdder(commands.Cog):
             await member.remove_roles(role)
 
     async def _load_emoji_to_role(self) -> None:
-        load_config(GLOBAL_CONFIG_PATH)
+        reload_global_config()
         return
 
 

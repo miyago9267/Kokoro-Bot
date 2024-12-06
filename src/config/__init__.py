@@ -15,3 +15,7 @@ if os.path.exists(GLOBAL_CONFIG_PATH):
     global_config = load_config(GLOBAL_CONFIG_PATH)
 
 __all__ = ['load_config', 'global_config', 'GLOBAL_CONFIG_PATH']
+
+def reload_global_config():
+    global global_config
+    global_config = load_config(GLOBAL_CONFIG_PATH)
