@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "paperscissorstone"
+name = "Kokkoro-Discord-Bot"
 version = "0.4.0"
 description = "Discord bot for miyago own server name Kokkoro"
 authors = ["miyago9267"]
