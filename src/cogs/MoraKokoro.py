@@ -7,6 +7,7 @@ import re, random, datetime
 class MoraKokoro(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.play_count = {}
 
         self.play = ["✊", "✌️", "🖐️"]
         self.text = ["平手！", "你輸了！雜魚雜魚", "幹, 你是不是作弊啊！"]
@@ -53,12 +54,23 @@ class MoraKokoro(commands.Cog):
         if bullets < 1:
             await itr.response.send_message('彈巢空間至少要有一顆子彈', ephemeral=True)
             return
-        choices = ['空' for i in range(bullets-1)] + ['子彈']
-        res = self._random_choice(itr.user.id, '隨機 '+' '.join(choices))
+        if bullets >= 32767:
+            await itr.response.send_message('你想隨機到哪裡去，雖然python沒有int上限但不要搞好不好==')
+            return
         user = itr.user
         member = itr.guild.get_member(user.id)
+        if self.play_count.get(user.id, 0) > 10:
+            await itr.response.send_message('你已經抽太多次了，明天請早', ephemeral=False)
+            return
+        choices = ['空' for _ in range(bullets-1)] + ['子彈']
+        choice_result = random.choice(choices)
+        if bullets >= 150:
+            res = self._random_format(f'空氣x{len(choices)-1} 子彈x1', None, choice_result)
+        else:
+            res = self._random_format(' '.join(choices), None, choice_result)
         await itr.response.send_message(res)
-        if bullets >= 69 and res[-4:-2] == '子彈' and not itr.user.id == itr.guild.owner_id:
+        self.play_count[user.id] = self.play_count.get(user.id, 0) + 1
+        if bullets >= 69 and choice_result == '子彈' and not itr.user.id == itr.guild.owner_id:
             minutes = 10
             guild_id = itr.guild.id
             role_id = global_config.get("KennedyRole", {}).get(str(guild_id), None)
@@ -76,7 +88,7 @@ class MoraKokoro(commands.Cog):
             await member.edit(timed_out_until=until, reason='你現在是美國總統，請等待10分鐘復活賽')
             await member.add_roles(role)
             await itr.channel.send(res)
-        elif bullets >= 69 and res[-4:-2] == '子彈' and itr.user.id == itr.guild.owner_id:
+        elif bullets >= 69 and choice_result == '子彈' and itr.user.id == itr.guild.owner_id:
             res = f'{member.mention}已被擊斃，但是可可蘿ban不掉群主'
             await itr.channel.send(f'{res}')
 
@@ -94,9 +106,12 @@ class MoraKokoro(commands.Cog):
         query_list = [i for i in random_query[st_idx+3:].strip(' ').split(' ') if i != '']
         query_text = random_query[:st_idx] if choice == None else choice
         if author == self.bot.owner_id and '還沒死透' in query_list:
-            return f'隨機 [ {" ".join(query_list)} ]\n{"" if query_text==None else query_text} ➝ **還沒死透**'
+            return self._self_format(" ".join(query_list), query_text, "還沒死透")
         else:
-            return f'隨機 [ {" ".join(query_list)} ]\n{"" if query_text==None else query_text} ➝ **{random.choice(query_list)}**'
+            return self._self_format(" ".join(query_list), query_text, random.choice(query_list))
+
+    def _random_format(self, query_list: str, query_text: str, query_result: str, large: bool = False) -> str:
+        return f'隨機 [ {query_list} ]\n{"" if query_text==None else query_text} ➝ **{query_result}**'
 
     async def _send_response(self, ctx, msg):
         await ctx.reply(msg)
