@@ -36,6 +36,11 @@ class MoraKokoro(commands.Cog):
 
         if re.search(r'\A(隨機\s|\S+\s隨機\s)', msg.content):
             await self._send_response(msg, self._random_choice(msg.author.id, msg.content))
+        
+        if msg.content.startswith('!kokoro resetplaycount'):
+            player = msg.content.split(' ')[-1]
+            self.play_count[player] = 0
+            await msg.channel.send('已重置玩家遊戲次數')
 
     @choice.command(name='dinner', description='決定晚餐要吃什麼')
     @app_commands.describe(choice='備選選項 沒靈感可以用預設的')
