@@ -168,3 +168,4 @@ songlist.*
 
 config/*
 !config/global.json.example
+.DS_Store
