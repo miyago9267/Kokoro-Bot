@@ -111,9 +111,9 @@ class MoraKokoro(commands.Cog):
         query_list = [i for i in random_query[st_idx+3:].strip(' ').split(' ') if i != '']
         query_text = random_query[:st_idx] if choice == None else choice
         if author == self.bot.owner_id and '還沒死透' in query_list:
-            return self._self_format(" ".join(query_list), query_text, "還沒死透")
+            return self._random_format(" ".join(query_list), query_text, "還沒死透")
         else:
-            return self._self_format(" ".join(query_list), query_text, random.choice(query_list))
+            return self._random_format(" ".join(query_list), query_text, random.choice(query_list))
 
     def _random_format(self, query_list: str, query_text: str, query_result: str, large: bool = False) -> str:
         return f'隨機 [ {query_list} ]\n{"" if query_text==None else query_text} ➝ **{query_result}**'
