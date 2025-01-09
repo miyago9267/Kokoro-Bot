@@ -1,13 +1,29 @@
 from discord import app_commands
 from discord.ext import commands
 from config import global_config
+from pydantic import BaseModel
 import discord
 import re, random, datetime
+
+class Player(BaseModel):
+    uid: str
+    play_count: int
+    last_play: datetime.datetime
+
+class PlayerDict(dict):
+    def __missing__(self, key):
+        player = Player(
+            uid=str(key),
+            play_count=0,
+            last_play=datetime.datetime.utcnow()
+        )
+        self[key] = player
+        return player
 
 class MoraKokoro(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.play_count = {}
+        self.play_count: dict[int, Player] = PlayerDict()
 
         self.play = ["✊", "✌️", "🖐️"]
         self.text = ["平手！", "你輸了！雜魚雜魚", "幹, 你是不是作弊啊！"]
@@ -38,8 +54,8 @@ class MoraKokoro(commands.Cog):
             await self._send_response(msg, self._random_choice(msg.author.id, msg.content))
         
         if msg.content.startswith('!kokoro resetplaycount'):
-            player = msg.content.split(' ')[-1]
-            self.play_count[player] = 0
+            player = int(msg.content.split(' ')[-1])
+            self.play_count[player].play_count = 0
             await msg.channel.send('已重置玩家遊戲次數')
 
     @choice.command(name='dinner', description='決定晚餐要吃什麼')
@@ -64,7 +80,9 @@ class MoraKokoro(commands.Cog):
             return
         user = itr.user
         member = itr.guild.get_member(user.id)
-        if self.play_count.get(user.id, 0) > 10:
+        if self.play_count[user.id].last_play.date() < datetime.datetime.utcnow().date():
+            self.play_count[user.id].play_count = 0
+        if self.play_count[user.id].play_count > 10:
             await itr.response.send_message('你已經抽太多次了，明天請早', ephemeral=False)
             return
         choices = ['空' for _ in range(bullets-1)] + ['子彈']
@@ -74,7 +92,9 @@ class MoraKokoro(commands.Cog):
         else:
             res = self._random_format(' '.join(choices), None, choice_result)
         await itr.response.send_message(res)
-        self.play_count[user.id] = self.play_count.get(user.id, 0) + 1
+        if self.play_count[user.id] == None:
+            self.play_count[user.id] = Player(uid=user.id, play_count=0, last_play=datetime.datetime.utcnow())
+        self.play_count[user.id].play_count = self.play_count[user.id].play_count + 1
         if bullets >= 69 and choice_result == '子彈' and not itr.user.id == itr.guild.owner_id:
             minutes = 10
             guild_id = itr.guild.id
