@@ -8,6 +8,8 @@ RUN apt-get update && apt-get install -y curl gcc build-essential
 
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
+RUN ~/.local/bin/poetry self add poetry-plugin-export
+
 RUN ~/.local/bin/poetry export -f requirements.txt --output requirements.txt
 
 FROM python:3.12-slim
